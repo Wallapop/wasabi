@@ -127,6 +127,8 @@ bootstrap() {
       DISTROVER=$DISTRIB_RELEASE
       if [ $DISTRO == "Ubuntu" ] && [ $DISTROVER == "16.04" ]; then
         echo "${green}Operating system Ubuntu 16.04${reset}"
+      elif [ $DISTRO == "Ubuntu" ] && [ $DISTROVER == "1r86.04" ]; then
+        echo "${green}Operating system Ubuntu 18.04${reset}"
       else
         echo "${red}Unsupported Linux distribution${reset}"
         exit 1
@@ -167,8 +169,14 @@ bootstrap() {
     sudo rm -rf /tmp/docker.list
     sudo apt-get purge lxc-docker
     sudo apt-get update
-    sudo apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
-    sudo apt-get install -y docker-engine
+
+    if [ $DISTRO == "Ubuntu" ] && [ $DISTROVER == "16.04" ]; then
+         sudo apt-get install -y linux-image-extra-$(uname -r) linux-image-extra-virtual
+     else
+         sudo apt-get install -y linux-modules-extra-$(uname -r) linux-image-extra-virtual
+    fi
+    
+   sudo apt-get install -y docker-engine
 
     sudo groupadd docker
     sudo usermod -aG docker $USER
@@ -179,7 +187,7 @@ bootstrap() {
   fi
 
   for n in yo grunt-cli bower; do
-    [[ ! $(npm -g list 2>/dev/null | grep ${n}) ]] && npm -g install ${n}
+    [[ ! $(npm -g list 2>/dev/null | grep ${n}) ]] && compass npm -g install ${n}
   done
 
   [[ ! $(gem list | grep compass) ]] && gem install compass
